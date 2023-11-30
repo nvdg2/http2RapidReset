@@ -2,7 +2,7 @@
 
 ## Introductie
 
-In dit onderzoek gaan wij kennis maken met de Denial Of Service aanval genaamd **HTTP/2 rapid Reset**. Een aanval dat is ontdekt in oktober 2023 en volgens verschillende bronnen nog enkele jaren sporadisch zal opduiken. We hebben deze aanval gekozen wegens zijn impact: alle webservers die het protocol HTTP/2 zijn namelijk vatbaar voor deze aanval, indien deze niet zijn voorzien van de correcte patch.
+In dit onderzoek gaan wij kennismaken met de Denial Of Service aanval genaamd **HTTP/2 rapid Reset**. Een aanval dat is ontdekt in oktober 2023 en volgens verschillende bronnen nog enkele jaren sporadisch zal opduiken. We hebben deze aanval gekozen wegens zijn impact: alle webservers die het protocol HTTP/2 zijn namelijk vatbaar voor deze aanval, indien deze niet zijn voorzien van de correcte patch.
 
 In dit onderzoek zullen de volgende elementen aan bod komen
 
@@ -19,7 +19,7 @@ _Deze sectie is gebaseerd op het grondig verrichtte onderzoek van Juho Snellman 
 
 CVE-2023-44487 is een Volume Distributed Denial of Service. Dit betekent dat de aanval een zwakheid uitbuit die het mogelijk maakt om een systeem zijn resources in te palmen. Belangrijk om te begrijpen is dat deze aanval niet gegarandeerd een systeem doet falen.
 
-Afhankelijk van de hoeveelheid resources de target machine heeft, is er een grote hoeveelheid aan computerkracht nodig om de aanval effectief te laten slagen. Denk maar aan 2 tot 10 tot duizenden computers.
+Afhankelijk van de hoeveelheid resources de target machine heeft, is er een grote hoeveelheid aan computerkracht nodig om de aanval daadwerkelijk te laten slagen. Denk maar aan 2 tot 10 tot duizenden computers.
 
 Vooraleer we kunnen toelichten hoe de aanval werkt, is het belangrijk om te begrijpen hoe het HTTP/2 protocol werkt en welke eigenschap kwetsbaar is voor de aanval.
 
@@ -32,7 +32,7 @@ HTTP/2 heeft een extra eigenschap namelijk "stream multiplexing": één de belan
 
 Bij HTTP/1 zou voor elk verzoek een nieuwe TCP connectie opgezet moeten worden. Bij HTTP/2 hoeft dit dus niet. Stream multiplexing maakt het namelijk mogelijk om meerdere "in-flight" requests te versturen, zonder meerdere individuele connecties te moeten beheren.
 
-Als we dieper ingaan op hoe HTTP/2 connecties werken, kunnen we vertellen dat een client de mogelijkheid heeft om meerdere streams tegelijkertijd te starten in een TCP-connectie. Over elke stream wordt dan een HTTP verzoek verzonden. Dit principe wordt zeer belangrijk wanneer we verder gaan bekijken hoe deze denial of service werkt.
+Als we dieper ingaan op hoe HTTP/2 connecties werken, kunnen we vertellen dat een client de mogelijkheid heeft om meerdere streams tegelijkertijd te starten in een TCP-connectie. Over elke stream wordt dan een HTTP verzoek verzonden. Dit principe wordt zeer belangrijk wanneer we verdergaan bekijken hoe deze denial of service werkt.
 
 ### Verschil normale DOS en HTTP/2 Rapid Reset
 
@@ -60,7 +60,41 @@ Het "resetten" van deze stream kost echter resources voor de server, maar beïnv
 Een bijkomend voordeel is dat het annuleren van een connectie ervoor zorgt dat het aantal open streams niet verhoogt. Waardoor de limiet van max toegelaten streams niet wordt overschreven.
 
 Tot slot is er nog een voordeel dat deze aanval met zich meeneemt: door het direct annuleren van de verzoeken, stuurt de reverse proxy van de server geen antwoord. Dit zorgt ervoor dat de hacker niet moet beschikken over grote bandbreedtes. Dit zou namelijk wel nodig zijn om de antwoorden van de server te kunnen slikken in klassieke aanvallen.
+
 ## Wat kunnen we tegen deze aanval doen
+
+Ook al is de aanval nog niet lang bekend, er zijn reeds heel wat methoden om jezelf te beschermen tegen deze DDOS.
+
+1. **Een wasstraat**: Een algemene oplossing om jezelf te beschermen tegen Distributed Denial of Services is het gebruiken van een wasstraat zoals Cloudflare of Google. Deze bedrijven hebben namelijk de capaciteit om grote hoeveelheden requests te absorberen en de legitieme requests door te laten naar de werkelijke eindbestemming. Meer informatie kan je terugvinden via de volgende [link](https://www.cloudflare.com/nl-nl/network-services/products/magic-transit/).
+
+	Op deze manier heeft jou site geen last van de effecten van deze aanval. Dit geldt ook voor de Rapid Reset aanval: ook al wordt de load grotendeels gevormd door HTTP/2 streams, er moeten nog altijd zeer veel requests naar de server gestuurd worden. Elke goede DDOS-bescherming zal de aanval herkennen en hierop anticiperen. 
+
+2. **Gebruik patches van software producenten**: Na het ontdekken van de aanval, hebben zeer veel bedrijven zoals Cloudflare, Microsoft en Google onderzoek gedaan naar een eventuele oplossing.
+	
+	Deze oplossing is ook gevonden en heel wat bedrijven hebben een implementatie hiervan verwerkt in hun software. Zo hebben de volgende webservers de nodige acties ondernomen, zodat je veilig gebruik kan maken van HTTP/2:
+	- [Nginx](https://www.nginx.com/blog/http-2-rapid-reset-attack-impacting-f5-nginx-products/)
+	- [Netty](https://github.com/netty/netty/security/advisories/GHSA-xpw8-rcwv-8f8p)
+	- [Haproxy](https://www.haproxy.com/blog/haproxy-is-not-affected-by-the-http-2-rapid-reset-attack-cve-2023-44487)
+	- [nghttp2](https://github.com/nghttp2/nghttp2/security/advisories/GHSA-vx74-f528-fxqg)
+	Indien je reeds gebruikmaakt van deze webservers, update dan zeker je softwareversie. Op deze manier beschik je van alle patches die zijn uitgebracht.
+
+3. **Manuele limieten instellen**: een aanbevolen actie die je onderneemt is om de instellingen van je webserver correct zetten. Op deze manier kan je eigenhandig de HTTP/2 Rapid Reset aanval te mitigeren.
+
+	De volgende instellingen worden best toegepast:
+	- Het aantal `keepalive_requests` tot max **1000** zetten
+	- Het aantal `http2_max_concurrent_streams` worden best niet boven **128** streams gezet
+	
+	Daarnaast zijn er nog extra aanbevelingen:
+	- Stel de `limit_conn` variabele in. Deze variabele limiet op het aantal connecties per client.
+	- Ook de `limit_req` variabele wordt best ingesteld. Deze bepaalt hoeveel requests maximaal er per tijdseenheid verwerkt mogen worden.
+
+	Aldus Micheal Vernik en Nina Forsyth.
+	
+	_De bovenstaande opties zijn gebaseerd op de syntax van Nginx De benaming kan licht verschillen tussen de verschillende webservers_
+
+4. **HTTP/2 protocol uitzetten**: Tot slot, indien je een snelle oplossing wilt, kan je tijdelijk het HTTP/2 protocol uitschakelen. De overzet van HTTP/1.1 en HTTP/2 is in normale omstandigheden geen grote taak en dus eenvoudig toe te passen.
+
+	Een voorbeeld: in Nginx moet je enkel "http2" uit tde volgende lijn weghalen om HTTP/2 te deactiveren: `listen 443 ssl http2;`.
 
 ## Demonstratie
 
@@ -85,6 +119,12 @@ De onderstaande foto laat het effect zien dat 1 computer heeft op een nginx webs
 We kunnen dus aannemen dat de DOS correct heeft gerund, aangezien één computer in normale omstandigheden nooit zo veel resources van een webserver vereist. Tot slot kunnen we vaststellen dat de DOS enkel impact had op CPU, wat onze bevindingen in de vorige onderdelen van ons onderzoek bevestigt. 
 ## Bronnen
 
-- Snellman, J., & Iamartino, D. (2023, 10 oktober). How it works: the novel HTTP/2 ‘Rapid Reset’ DDoS attack. _Google Cloud Blog_. https://cloud.google.com/blog/products/identity-security/how-it-works-the-novel-http2-rapid-reset-ddos-attack
+- Snellman, J., & Iamartino, D. (2023, 10 oktober). How it works: the novel HTTP/2 ‘Rapid Reset’ DDoS attack. _Google Cloud Blog_. https://cloud.google.com/blog/products/identity-security/how-it-works-the-novel-http2-rapid-reset-ddos-attack
 
 - Pardue, L. (2023, 27 oktober). _HTTP/2 rapid reset: Deconstructing the record-breaking attack_. The Cloudflare Blog. https://blog.cloudflare.com/technical-breakdown-http2-rapid-reset-ddos-attack/
+
+- _HTTP/2 Rapid Reset Attack Protection | CloudFlare_. (z.d.). Cloudflare. Geraadpleegd op 30 november 2023, van https://www.cloudflare.com/en-gb/h2/
+
+- _CVE-details_. (2023, 29 november). Redhat. Geraadpleegd op 30 november 2023, van https://access.redhat.com/security/cve/cve-2023-44487
+
+- Vernik, M., & Forsyth, N. (2023, 10 oktober). _HTTP/2 Rapid Reset Attack Impacting F5 NGINX Products_. Nginx. Geraadpleegd op 30 november 2023, van https://www.nginx.com/blog/http-2-rapid-reset-attack-impacting-f5-nginx-products/
