@@ -60,6 +60,10 @@ Een bijkomend voordeel is dat het annuleren van een connectie ervoor zorgt dat h
 
 Tot slot is er nog een voordeel dat deze aanval met zich meeneemt: door het direct annuleren van de verzoeken, stuurt de reverse proxy van de server geen antwoord. Dit zorgt ervoor dat de hacker niet moet beschikken over grote bandbreedtes. Dit zou namelijk wel nodig zijn om de antwoorden van de server te kunnen slikken in klassieke aanvallen.
 
+<div style="page-break-after: always; visibility: hidden">
+\pagebreak
+</div>
+
 ## Wat kunnen we tegen deze aanval doen
 
 Ook al is de aanval nog niet lang bekend, er zijn reeds heel wat methoden om jezelf te beschermen tegen deze DDOS.
