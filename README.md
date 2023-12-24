@@ -72,35 +72,33 @@ Ook al is de aanval nog niet lang bekend, er zijn reeds heel wat methoden om jez
 
 	Op deze manier heeft jou site geen last van de effecten van deze aanval. Dit geldt ook voor de Rapid Reset aanval: ook al wordt de load grotendeels gevormd door HTTP/2 streams, er moeten nog altijd zeer veel requests naar de server gestuurd worden. Elke goede DDOS-bescherming zal de aanval herkennen en hierop anticiperen.
 
-4. **Gebruik patches van software producenten**: Na het ontdekken van de aanval, hebben zeer veel bedrijven zoals Cloudflare, Microsoft en Google onderzoek gedaan naar een eventuele oplossing. Deze oplossing is ook gevonden en heel wat bedrijven hebben een implementatie hiervan verwerkt in hun software. Zo hebben de volgende webservers de nodige acties ondernomen, zodat je veilig gebruik kan maken van HTTP/2:
+2. **Gebruik patches van software producenten**: Na het ontdekken van de aanval, hebben zeer veel bedrijven zoals Cloudflare, Microsoft en Google onderzoek gedaan naar een eventuele oplossing. Deze oplossing is ook gevonden en heel wat bedrijven hebben een implementatie hiervan verwerkt in hun software. Zo hebben de volgende webservers de nodige acties ondernomen, zodat je veilig gebruik kan maken van HTTP/2:
 	- [Nginx](https://www.nginx.com/blog/http-2-rapid-reset-attack-impacting-f5-nginx-products/)
 	- [Netty](https://github.com/netty/netty/security/advisories/GHSA-xpw8-rcwv-8f8p)
 	- [Haproxy](https://www.haproxy.com/blog/haproxy-is-not-affected-by-the-http-2-rapid-reset-attack-cve-2023-44487)
 	- [nghttp2](https://github.com/nghttp2/nghttp2/security/advisories/GHSA-vx74-f528-fxqg)
 
-	Een van deze patches is nakijken hoeveel RST_STREAMS worden uitgestuurd. Bij een abnormaal aantal RST_STREAMS, zal de server de connectie met de client verbreken.
-
-Indien je reeds gebruikmaakt van deze webservers, update dan zeker je softwareversie. Op deze manier beschik je van alle patches die zijn uitgebracht.
+	Indien je reeds gebruikmaakt van deze webservers, update dan zeker je softwareversie. Op deze manier beschik je van alle patches die zijn uitgebracht. Een van deze patches is nakijken hoeveel RST_STREAMS worden uitgestuurd. Bij een abnormaal aantal RST_STREAMS, zal de server de connectie met de client verbreken.
 
 3. **Manuele limieten instellen**: een aanbevolen actie die je onderneemt is om de instellingen van je webserver correct zetten. Op deze manier kan je eigenhandig de HTTP/2 Rapid Reset aanval te mitigeren.
 
-De volgende instellingen worden best toegepast:
+	De volgende instellingen worden best toegepast:
+	
+	- Het aantal `keepalive_requests` tot max **1000** zetten
+	- Het aantal `http2_max_concurrent_streams` worden best niet boven **128** streams gezet
+	
+	Daarnaast zijn er nog extra aanbevelingen:
+	
+	- Stel de `limit_conn` variabele in. Deze variabele limiet op het aantal connecties per client.
+	- Ook de `limit_req` variabele wordt best ingesteld. Deze bepaalt hoeveel requests maximaal er per tijdseenheid verwerkt mogen worden.
+	
+	Aldus Micheal Vernik en Nina Forsyth.
+	
+	**_De bovenstaande opties zijn gebaseerd op de syntax van Nginx. De benaming kan licht verschillen tussen de verschillende webservers_**
 
-- Het aantal `keepalive_requests` tot max **1000** zetten
-- Het aantal `http2_max_concurrent_streams` worden best niet boven **128** streams gezet
+1. **HTTP/2 protocol uitzetten**: Tot slot, indien je een snelle oplossing wilt, kan je tijdelijk het HTTP/2 protocol uitschakelen. De overzet van HTTP/2 en HTTP/1.1 is in normale omstandigheden geen grote taak en dus eenvoudig toe te passen.
 
-Daarnaast zijn er nog extra aanbevelingen:
-
-- Stel de `limit_conn` variabele in. Deze variabele limiet op het aantal connecties per client.
-- Ook de `limit_req` variabele wordt best ingesteld. Deze bepaalt hoeveel requests maximaal er per tijdseenheid verwerkt mogen worden.
-
-Aldus Micheal Vernik en Nina Forsyth.
-
-**_De bovenstaande opties zijn gebaseerd op de syntax van Nginx. De benaming kan licht verschillen tussen de verschillende webservers_**
-
-4. **HTTP/2 protocol uitzetten**: Tot slot, indien je een snelle oplossing wilt, kan je tijdelijk het HTTP/2 protocol uitschakelen. De overzet van HTTP/2 en HTTP/1.1 is in normale omstandigheden geen grote taak en dus eenvoudig toe te passen.
-
-Een voorbeeld: in Nginx moet je enkel "http2" uit de volgende lijn weghalen om HTTP/2 te deactiveren: `listen 443 ssl http2;`.
+	Een voorbeeld: in Nginx moet je enkel "http2" uit de volgende lijn weghalen om HTTP/2 te deactiveren: `listen 443 ssl http2;`.
 
 ## Demonstratie / handleiding
 
