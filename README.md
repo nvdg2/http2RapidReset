@@ -100,9 +100,43 @@ Aldus Micheal Vernik en Nina Forsyth.
 
 Een voorbeeld: in Nginx moet je enkel "http2" uit de volgende lijn weghalen om HTTP/2 te deactiveren: `listen 443 ssl http2;`.
 
-## Demonstratie
+## Demonstratie / handleiding
 
 In onze demonstratie maken we gebruiken van een oudere nginx versie namelijk 1.23.2 deze is ongeveer 1 jaar oud en bevat dus nog geen patches tegen de HTTP/2 Rapid Reset aanval. Doorheen de demonstratie hebben we gebruik gemaakt van het script in de volgende repository: [https://github.com/secengjeff/rapidresetclient](https://github.com/secengjeff/rapidresetclient)
+
+### Voorbereiding
+
+Ook al beschrijft de repository duidelijk welke stappen doorlopen moeten worden. Hieronder kan u kort dezelfde stappen terugvinden om de hacking tool te installeren.
+
+> Om gebruik te kunnen maken van de tool, moet "Go" geïnstalleerd zijn op het besturingssysteem.
+> 
+> Documentatie voor installatie: [link](https://go.dev/doc/install)
+> 
+> Wanneer Go succesvol is geïnstalleerd, kan je verder met de volgende stappen.
+
+1. Als eerst clone je de repository naar uw lokale computer. Dit kan vie het volgende commando:
+
+```bash
+git clone https://github.com/secengjeff/rapidresetclient.git
+```
+
+2. Vervolgens navigeer je met een terminal in de gekloonde repo en installeer je de nodige dependencies:
+
+```go
+go get golang.org/x/net/http2
+
+go get golang.org/x/net/http2/hpack
+```
+
+3. Tot slot bouw je de hacking tool door het volgend commando te gebruiken:
+
+```go
+go build -o rapidresetclient
+```
+
+Als alles goed is verlopen, verschijnt het uitvoerbaar programma "rapidresetclient" in je huidige directory. Met dit programme werken wij verder om de aanval uit te voeren.
+
+### Starten van de aanval
 
 De aanval wordt uitgevoerd via het volgende commando:
 
