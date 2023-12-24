@@ -2,7 +2,7 @@
 
 ## Introductie
 
-In dit onderzoek gaan wij kennismaken met de Denial Of Service aanval genaamd **HTTP/2 Rapid Reset**. Een aanval dat is ontdekt in oktober 2023 en volgens verschillende bronnen nog enkele jaren sporadisch zal opduiken. We hebben deze aanval gekozen wegens zijn impact: alle webservers die het protocol HTTP/2 zijn namelijk vatbaar voor deze aanval, indien deze niet zijn voorzien van de correcte patch.
+In dit onderzoek gaan wij kennismaken met de Denial Of Service aanval genaamd **HTTP/2 Rapid Reset**. Een aanval dat is ontdekt in oktober 2023 en volgens verschillende bronnen nog enkele jaren sporadisch zal opduiken. We hebben deze aanval gekozen wegens zijn impact: alle webservers die het protocol HTTP/2 zijn namelijk vatbaar voor deze aanval, indien deze niet zijn voorzien van de correcte instellingen.
 
 In dit onderzoek zullen de volgende elementen aan bod komen
 
@@ -31,7 +31,7 @@ HTTP/2 heeft een extra eigenschap namelijk "stream multiplexing": één de belan
 
 Bij HTTP/1 zou voor elk verzoek een nieuwe TCP connectie opgezet moeten worden. Bij HTTP/2 hoeft dit dus niet. Stream multiplexing maakt het namelijk mogelijk om meerdere "in-flight" requests te versturen, zonder meerdere individuele connecties te moeten beheren.
 
-Als we dieper ingaan op hoe HTTP/2 connecties werken, kunnen we vertellen dat een client de mogelijkheid heeft om meerdere streams tegelijkertijd te starten in een TCP-connectie. Over elke stream wordt dan een HTTP verzoek verzonden. Dit principe wordt zeer belangrijk wanneer we verdergaan bekijken hoe deze denial of service werkt.
+Als we dieper ingaan op hoe HTTP/2 connecties werken, kunnen we vertellen dat een client de mogelijkheid heeft om meerdere streams tegelijkertijd te starten in een TCP-connectie. Over elke stream wordt dan een HTTP-verzoek verzonden. Dit principe wordt zeer belangrijk wanneer we verdergaan bekijken hoe deze denial of service werkt.
 
 ### Verschil normale DOS en HTTP/2 Rapid Reset
 
@@ -102,7 +102,13 @@ Een voorbeeld: in Nginx moet je enkel "http2" uit de volgende lijn weghalen om H
 
 ## Demonstratie / handleiding
 
-In onze demonstratie maken we gebruiken van een oudere nginx versie namelijk 1.23.2 deze is ongeveer 1 jaar oud en bevat dus nog geen patches tegen de HTTP/2 Rapid Reset aanval. Doorheen de demonstratie hebben we gebruik gemaakt van het script in de volgende repository: [https://github.com/secengjeff/rapidresetclient](https://github.com/secengjeff/rapidresetclient)
+In onze demonstratie maken we gebruiken van een oudere nginx versie namelijk 1.23.2 deze is ongeveer 1 jaar oud en bevat dus nog geen patches tegen de HTTP/2 Rapid Reset aanval. We hebben wel een aangepaste nginx configuratie gebruikt, om HTTP/2 effectiever te maken tijdens de demonstratie. Deze kan u hieronder terugvinden:
+
+```config
+
+```
+
+Doorheen de demonstratie hebben we gebruik gemaakt van het script in de volgende repository: [https://github.com/secengjeff/rapidresetclient](https://github.com/secengjeff/rapidresetclient)
 
 ### Voorbereiding
 
@@ -147,11 +153,11 @@ De aanval wordt uitgevoerd via het volgende commando:
 Op de onderstaande foto kan u zien dat de aanval wordt uitgevoerd.
 ![POC attack output](Images/attackerView.png)
 
-De onderstaande foto laat zien dat de aanval veel resources van de computer heeft gevraagd. Doordat de swap partitie in actie is moeten schieten, betekent dat de aanval minstens 15 GB aan ram heeft gekost. Daarnaast waren ook hoge CPU waarden aanwezig tijdens de aanval zelf.
+Vooraleer we kijken naar de resultaten op de server, willen we via de onderstaande foto laten zien dat de aanval veel resources van de aanvallende computer vereist. Doordat de swap partitie in actie is moeten schieten, betekent dat de aanval minstens 15 GB aan ram heeft gekost. Daarnaast waren ook hoge CPU waarden aanwezig tijdens de aanval zelf.
 
 ![Indication high RAM Usage](Images/swapUsed.png)
 
-Tijdens sommige momenten ondervonden we zelfs dat onze computer de DOS uitschakelde om de CPU minder te belasten.
+Tijdens sommige momenten ondervonden we zelfs dat onze computer de DOS uitschakelde om de CPU minder te belasten. Dit bewijst dat de aanval best door meerdere bots wordt uitgevoerd, aangezien deze ook intensief is voor de aanvallende machine.
 
 De onderstaande foto laat het effect van 2 aanvallende computers zien. We zien dat de container zijn CPU resource tot +- 20 procent werden ingenomen. We kunnen dus aannemen, wanneer we beschikken over meer computerkracht (circa 5 tot 7 computers) dat de aanval succesvol de container kan overbelasten.
 
