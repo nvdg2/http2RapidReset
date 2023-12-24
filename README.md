@@ -150,6 +150,10 @@ services:
 
 Doorheen de demonstratie hebben we gebruik gemaakt van het script in de volgende repository: [https://github.com/secengjeff/rapidresetclient](https://github.com/secengjeff/rapidresetclient)
 
+<div style="page-break-after: always; visibility: hidden">
+\pagebreak
+</div>
+
 ### Voorbereiding
 
 Ook al beschrijft de repository duidelijk welke stappen doorlopen moeten worden. Hieronder kan u kort dezelfde stappen terugvinden om de hacking tool te installeren.
@@ -182,6 +186,10 @@ go build -o rapidresetclient
 
 Als alles goed is verlopen, verschijnt het uitvoerbaar programma "rapidresetclient" in je huidige directory. Met dit programme werken wij verder om de aanval uit te voeren.
 
+<div style="page-break-after: always; visibility: hidden">
+\pagebreak
+</div>
+
 ### Starten van de aanval
 
 De aanval wordt uitgevoerd via het volgende commando:
@@ -199,7 +207,7 @@ Vooraleer we kijken naar de resultaten op de server, willen we via de onderstaan
 
 Tijdens sommige momenten ondervonden we zelfs dat onze computer de DOS uitschakelde om de CPU minder te belasten. Dit bewijst dat de aanval best door meerdere bots wordt uitgevoerd, aangezien deze ook intensief is voor de aanvallende machine.
 
-De onderstaande foto laat het effect van 2 aanvallende computers zien. We zien dat de container zijn CPU resource tot +- 20 procent werden ingenomen. We kunnen dus aannemen, wanneer we beschikken over meer computerkracht (circa 5 tot 7 computers) dat de aanval succesvol de container kan overbelasten.
+De onderstaande foto laat het effect van 2 aanvallende computers zien. We zien dat de container zijn CPU resource tot +- 26 procent werden ingenomen. We kunnen dus aannemen, wanneer we beschikken over meer computerkracht (circa 4 tot 5 computers) dat de aanval succesvol de container kan overbelasten.
 
 ![CPU usage](Images/cpuUsage.png)
 
@@ -207,7 +215,7 @@ We kunnen dus besluiten dat de aanval correct is verlopen, aangezien twee comput
 
 ## Video
 
-Tot slot kan u een korte video terugvinden waarbij twee computers de aanval uitvoeren op een docker container met kwetsbare HTTP/2 webserver: [video](https://apbe-my.sharepoint.com/:f:/g/personal/s130529_ap_be/EsSqb5-PeBpAhVrvaXngYjUBxigLsvqSRFvMPlJazwiYEQ?e=z6gsZk)
+Tot slot kan u een korte video terugvinden waarbij twee computers de aanval uitvoeren op een docker container met kwetsbare HTTP/2 webserver: [video](https://apbe-my.sharepoint.com/:v:/g/personal/s130529_ap_be/EVb9-2HxQu1Ar528Z6gHoVoBUC0NWWO5rJ8vvV3IkrHPXQ))
 
 ---
 
