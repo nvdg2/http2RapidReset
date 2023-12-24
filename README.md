@@ -70,14 +70,16 @@ Ook al is de aanval nog niet lang bekend, er zijn reeds heel wat methoden om jez
 
 1. **Een wasstraat**: Een algemene oplossing om jezelf te beschermen tegen Distributed Denial of Services is het gebruiken van een wasstraat zoals Cloudflare of Google. Deze bedrijven hebben namelijk de capaciteit om grote hoeveelheden requests te absorberen en de legitieme requests door te laten naar de werkelijke eindbestemming. Meer informatie kan je terugvinden via de volgende [link](https://www.cloudflare.com/nl-nl/network-services/products/magic-transit/).
 
- Op deze manier heeft jou site geen last van de effecten van deze aanval. Dit geldt ook voor de Rapid Reset aanval: ook al wordt de load grotendeels gevormd door HTTP/2 streams, er moeten nog altijd zeer veel requests naar de server gestuurd worden. Elke goede DDOS-bescherming zal de aanval herkennen en hierop anticiperen.
+	Op deze manier heeft jou site geen last van de effecten van deze aanval. Dit geldt ook voor de Rapid Reset aanval: ook al wordt de load grotendeels gevormd door HTTP/2 streams, er moeten nog altijd zeer veel requests naar de server gestuurd worden. Elke goede DDOS-bescherming zal de aanval herkennen en hierop anticiperen.
 
-2. **Gebruik patches van software producenten**: Na het ontdekken van de aanval, hebben zeer veel bedrijven zoals Cloudflare, Microsoft en Google onderzoek gedaan naar een eventuele oplossing. Deze oplossing is ook gevonden en heel wat bedrijven hebben een implementatie hiervan verwerkt in hun software. Zo hebben de volgende webservers de nodige acties ondernomen, zodat je veilig gebruik kan maken van HTTP/2:
+4. **Gebruik patches van software producenten**: Na het ontdekken van de aanval, hebben zeer veel bedrijven zoals Cloudflare, Microsoft en Google onderzoek gedaan naar een eventuele oplossing. Deze oplossing is ook gevonden en heel wat bedrijven hebben een implementatie hiervan verwerkt in hun software. Zo hebben de volgende webservers de nodige acties ondernomen, zodat je veilig gebruik kan maken van HTTP/2:
+	- [Nginx](https://www.nginx.com/blog/http-2-rapid-reset-attack-impacting-f5-nginx-products/)
+	- [Netty](https://github.com/netty/netty/security/advisories/GHSA-xpw8-rcwv-8f8p)
+	- [Haproxy](https://www.haproxy.com/blog/haproxy-is-not-affected-by-the-http-2-rapid-reset-attack-cve-2023-44487)
+	- [nghttp2](https://github.com/nghttp2/nghttp2/security/advisories/GHSA-vx74-f528-fxqg)
 
-- [Nginx](https://www.nginx.com/blog/http-2-rapid-reset-attack-impacting-f5-nginx-products/)
-- [Netty](https://github.com/netty/netty/security/advisories/GHSA-xpw8-rcwv-8f8p)
-- [Haproxy](https://www.haproxy.com/blog/haproxy-is-not-affected-by-the-http-2-rapid-reset-attack-cve-2023-44487)
-- [nghttp2](https://github.com/nghttp2/nghttp2/security/advisories/GHSA-vx74-f528-fxqg)
+	Een van deze patches is nakijken hoeveel RST_STREAMS worden uitgestuurd. Bij een abnormaal aantal RST_STREAMS, zal de server de connectie met de client verbreken.
+
 Indien je reeds gebruikmaakt van deze webservers, update dan zeker je softwareversie. Op deze manier beschik je van alle patches die zijn uitgebracht.
 
 3. **Manuele limieten instellen**: een aanbevolen actie die je onderneemt is om de instellingen van je webserver correct zetten. Op deze manier kan je eigenhandig de HTTP/2 Rapid Reset aanval te mitigeren.
@@ -167,7 +169,16 @@ We kunnen dus besluiten dat de aanval correct is verlopen, aangezien twee comput
 
 ## Video
 
-Tot slot kan u een korte video terugvinden waarbij twee computers de aanval uitvoeren op een docker container met kwetsbare HTTP/2 werbserver: [video](https://apbe-my.sharepoint.com/:f:/g/personal/s130529_ap_be/EsSqb5-PeBpAhVrvaXngYjUBxigLsvqSRFvMPlJazwiYEQ?e=z6gsZk)
+Tot slot kan u een korte video terugvinden waarbij twee computers de aanval uitvoeren op een docker container met kwetsbare HTTP/2 webserver: [video](https://apbe-my.sharepoint.com/:f:/g/personal/s130529_ap_be/EsSqb5-PeBpAhVrvaXngYjUBxigLsvqSRFvMPlJazwiYEQ?e=z6gsZk)
+
+---
+
+Niels Van De Ginste
+Tom Goedemé
+
+<div style="page-break-after: always; visibility: hidden">
+\pagebreak
+</div>
 
 ## Bronnen
 
