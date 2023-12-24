@@ -82,6 +82,8 @@ Ook al is de aanval nog niet lang bekend, er zijn reeds heel wat methoden om jez
 
 3. **Manuele limieten instellen**: een aanbevolen actie die je onderneemt is om de instellingen van je webserver correct zetten. Op deze manier kan je eigenhandig de HTTP/2 Rapid Reset aanval te mitigeren.
 
+	> De onderstaande opties zijn gebaseerd op de syntax van Nginx. De benaming kan licht verschillen tussen verschillende webservers
+
 	De volgende instellingen worden best toegepast:
 	
 	- Het aantal `keepalive_requests` tot max **1000** zetten
@@ -94,18 +96,56 @@ Ook al is de aanval nog niet lang bekend, er zijn reeds heel wat methoden om jez
 	
 	Aldus Micheal Vernik en Nina Forsyth.
 	
-	**_De bovenstaande opties zijn gebaseerd op de syntax van Nginx. De benaming kan licht verschillen tussen de verschillende webservers_**
-
-1. **HTTP/2 protocol uitzetten**: Tot slot, indien je een snelle oplossing wilt, kan je tijdelijk het HTTP/2 protocol uitschakelen. De overzet van HTTP/2 en HTTP/1.1 is in normale omstandigheden geen grote taak en dus eenvoudig toe te passen.
+4. **HTTP/2 protocol uitzetten**: Tot slot, indien je een snelle oplossing wilt, kan je tijdelijk het HTTP/2 protocol uitschakelen. De overzet van HTTP/2 en HTTP/1.1 is in normale omstandigheden geen grote taak en dus eenvoudig toe te passen.
 
 	Een voorbeeld: in Nginx moet je enkel "http2" uit de volgende lijn weghalen om HTTP/2 te deactiveren: `listen 443 ssl http2;`.
 
 ## Demonstratie / handleiding
 
-In onze demonstratie maken we gebruiken van een oudere nginx versie namelijk 1.23.2 deze is ongeveer 1 jaar oud en bevat dus nog geen patches tegen de HTTP/2 Rapid Reset aanval. We hebben wel een aangepaste nginx configuratie gebruikt, om HTTP/2 effectiever te maken tijdens de demonstratie. Deze kan u hieronder terugvinden:
+In onze demonstratie maken we gebruiken van een oudere nginx versie namelijk 1.23.2 deze is ongeveer 1 jaar oud en bevat dus nog geen patches tegen de HTTP/2 Rapid Reset aanval. We hebben wel een aangepaste Nginx configuratie gebruikt, om HTTP/2 effectiever te maken tijdens de demonstratie. Deze kan u hieronder terugvinden:
 
 ```config
+server {
+    listen 80;
+    listen 443 ssl http2;
+    server_name ${NGINX_HOST};
 
+    ssl_certificate /certs/ca.pem;
+    ssl_certificate_key /certs/ca-key.pem;
+
+    keepalive_requests 100000;
+    http2_max_concurrent_streams 1000000;
+
+    location / {
+	root /usr/share/nginx/html;
+	index index.html index.htm;
+    }
+}
+```
+
+De Nginx server draait in een docker container. De docker compose van de omgeving vindt u hieronder terug:
+
+```yaml
+version: '3.1'
+services:
+  web:
+    image: nginx:1.23.2
+    depends_on:
+      - certs
+    volumes:
+     - ./templates:/etc/nginx/templates:ro
+     - ./certs:/certs:ro
+    ports:
+     - 80:80
+     - 443:443
+    environment:
+     - NGINX_HOST=kubernoodles.ap
+
+  certs:
+    image: stakater/ssl-certs-generator
+    restart: "no"
+    volumes:
+      - ./certs:/certs
 ```
 
 Doorheen de demonstratie hebben we gebruik gemaakt van het script in de volgende repository: [https://github.com/secengjeff/rapidresetclient](https://github.com/secengjeff/rapidresetclient)
