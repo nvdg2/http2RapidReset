@@ -194,7 +194,7 @@ Als alles goed is verlopen, verschijnt het uitvoerbaar programma "rapidresetclie
 
 De aanval wordt uitgevoerd via het volgende commando:
 
-```text
+```bash
 ./rapidresetclient -requests=100000 -url https://kubernoodles.ap/ -concurrency=6 -delay=1
 ```
 
@@ -215,7 +215,25 @@ We kunnen dus besluiten dat de aanval correct is verlopen, aangezien twee comput
 
 ## Video
 
-Tot slot kan u een korte video terugvinden waarbij twee computers de aanval uitvoeren op een docker container met kwetsbare HTTP/2 webserver: [video](https://apbe-my.sharepoint.com/:v:/g/personal/s130529_ap_be/EVb9-2HxQu1Ar528Z6gHoVoBUC0NWWO5rJ8vvV3IkrHPXQ))
+Tot slot kan u een korte video terugvinden waarbij twee computers de aanval uitvoeren op een docker container met kwetsbare HTTP/2 webserver: [video](https://apbe-my.sharepoint.com/:v:/g/personal/s130529_ap_be/EVb9-2HxQu1Ar528Z6gHoVoBUC0NWWO5rJ8vvV3IkrHPXQ)
+
+## Uitbreiding
+
+We hebben als uitbreiding getest of het Intrusion Prevention System [Snort](https://www.snort.org/) werkt tegen de HTTP/2 Rapid Reset DOS. Jammer genoeg heeft dit systeem de aanval niet geblokkeerd. U uit de onderstaande video de volgende conclusies trekken :
+
+- Alle regels worden gebruikt in Snort
+- De aanval geraakt door de firewall, ondanks de IPS die actief is
+
+Link naar video: [link](https://apbe-my.sharepoint.com/:v:/g/personal/s130529_ap_be/EcXyVmJtuThFrtRw6wiUfVcBzSWEPMkleJpbrIdrhmUbTw) (De muis op de VM werd niet goed opgevangen door OBS, excuses voor de haperende frames.)
+
+Hieronder kan u nog de foto zien dat laat zien welke netwerken Snort monitoren:
+
+![pass_list](Images/pass_list.png)
+De aanvallende computer had IP-adres 192.168.2.203/24, wat betekent dat de IPS actief luistert naar alle communicatie van deze machine.
+
+Daarnaast hebben we de IPS al actief connecties zien blokkeren: wanneer we via de remote SSH client van VSCode wilde verbinden met de target VM, blokkeerde Snort de connectie. De volgende logs waren toen ook gegenereerd:
+
+![ssh_block](Images/SSH_block.png)
 
 ---
 
@@ -239,3 +257,5 @@ Tom Goedemé
 - Vernik, M., & Forsyth, N. (2023, 10 oktober). _HTTP/2 Rapid Reset Attack Impacting F5 NGINX Products_. Nginx. Geraadpleegd op 30 november 2023, van [https://www.nginx.com/blog/http-2-rapid-reset-attack-impacting-f5-nginx-products/](https://www.nginx.com/blog/http-2-rapid-reset-attack-impacting-f5-nginx-products/)
 
 - Secengjeff. (2023, 10 oktober). GitHub - secengjeff/rapidresetclient: Tool for Testing Mitigations and Exposure to Rapid Reset DDOS (CVE-2023-44487). GitHub. Geraadpleegd op 3 december 2023, van [https://github.com/secengjeff/rapidresetclient](https://github.com/secengjeff/rapidresetclient)
+
+- _SNORT - Network Intrusion Detection & Prevention System_. (z.d.). Geraadpleegd op 30 december 2023, van [https://www.snort.org/](https://www.snort.org/)

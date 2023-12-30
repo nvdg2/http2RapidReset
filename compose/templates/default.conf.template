@@ -1,0 +1,16 @@
+server {
+    listen 80;
+    listen 443 ssl http2;
+    server_name ${NGINX_HOST};
+
+    ssl_certificate /certs/ca.pem;
+    ssl_certificate_key /certs/ca-key.pem;
+
+    keepalive_requests 100000;
+    http2_max_concurrent_streams 1000000;
+
+    location / {
+	root /usr/share/nginx/html;
+	index index.html index.htm;
+    }
+}

@@ -1,0 +1,20 @@
+version: '3.1'
+services:
+  web:
+    image: nginx:1.23.2
+    depends_on:
+      - certs
+    volumes:
+     - ./templates:/etc/nginx/templates:ro
+     - ./certs:/certs:ro
+    ports:
+     - 80:80
+     - 443:443
+    environment:
+     - NGINX_HOST=kubernoodles.ap
+
+  certs:
+    image: stakater/ssl-certs-generator
+    restart: "no"
+    volumes:
+      - ./certs:/certs
